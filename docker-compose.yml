@@ -9,7 +9,8 @@ services:
     command: ./bin/thrust ./bin/rails server
     environment:
       RAILS_ENV: production
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      # Rails will use RAILS_MASTER_KEY env var if set, otherwise look for config/master.key file
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
       # Database connection - uses external PostgreSQL on host
       # Option 1: Use host.docker.internal (works on Docker Desktop and some Linux setups)
       DB_HOST: ${DB_HOST:-host.docker.internal}
@@ -23,6 +24,9 @@ services:
       # DATABASE_URL: postgresql://${DB_USERNAME:-mwtt}:${DB_PASSWORD}@${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/mwtt_production
     volumes:
       - storage_data:/rails/storage
+      # Mount master.key file if you copied it to the server (Option A)
+      # Uncomment the line below and ensure config/master.key exists on the host
+      # - ./config/master.key:/rails/config/master.key:ro
     ports:
       - "80:80"
     # Option: Uncomment below to use host network (allows direct localhost access)

@@ -54,6 +54,45 @@ Kamal is Rails 8's modern deployment tool. It handles:
 
 The `docker-compose.yml` file is already created in the repository. The Dockerfile copies your code into the Docker image during the build process, so you need to clone the repo on your Docker server.
 
+### Install Docker Compose (if needed):
+
+**Check if you have Docker Compose:**
+```bash
+# Try the modern syntax (Docker Compose v2)
+docker compose version
+
+# Or the legacy syntax (Docker Compose v1)
+docker-compose --version
+```
+
+**If neither works, install Docker Compose:**
+
+**Option A: Install Docker Compose v2 (recommended - comes with newer Docker)**
+```bash
+# Docker Compose v2 is included with Docker Desktop and newer Docker Engine installations
+# If you have Docker but not Compose, update Docker:
+# On Ubuntu/Debian:
+sudo apt-get update
+sudo apt-get install docker-compose-plugin
+
+# Verify installation
+docker compose version
+```
+
+**Option B: Install standalone docker-compose v1**
+```bash
+# Download latest version
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# Make executable
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Verify installation
+docker-compose --version
+```
+
+**Note:** All commands below use `docker compose` (v2 syntax). If you installed v1, replace `docker compose` with `docker-compose` (with hyphen) in all commands.
+
 ### Deployment Workflow:
 
 **1. On your Docker server, clone the repository:**
@@ -73,39 +112,54 @@ git pull origin main
 
 Rails credentials work in production! The encrypted file (`config/credentials.yml.enc`) is already in the repo. You just need to copy the master key to decrypt it.
 
-**Option A: Copy master.key file (recommended)**
+**Option A: Copy master.key file and mount it in Docker**
 ```bash
 # On your local machine, securely copy the master key to the server
 scp config/master.key user@your-docker-server:/path/to/mwtt/config/master.key
 
 # On the server, set proper permissions
 chmod 600 config/master.key
+
+# Edit docker-compose.yml and uncomment the master.key volume mount line:
+# - ./config/master.key:/rails/config/master.key:ro
 ```
 
-**Option B: Use RAILS_MASTER_KEY environment variable**
+**Option B: Use RAILS_MASTER_KEY environment variable (simpler)**
 ```bash
 # On your local machine, get the master key value
 cat config/master.key
 
-# On the server, create .env file with the master key
+# On the server, you'll create .env file in step 3 with the master key
+# (see step 3 below)
+```
+
+**Note:** 
+- **Option A:** Mounts the file directly into the container. Rails will automatically find it at `config/master.key`.
+- **Option B:** Uses environment variable from `.env` file. This is simpler and doesn't require editing `docker-compose.yml`.
+
+**3. Create .env file with configuration:**
+
+Create a `.env` file with your database connection and Rails master key:
+
+**If you used Option A (copied master.key file):**
+```bash
+# You still need .env for database connection, but RAILS_MASTER_KEY is optional
+# (Rails will use the mounted file if RAILS_MASTER_KEY is not set)
 cat > .env << EOF
-RAILS_MASTER_KEY=<paste_the_master_key_value_here>
+DB_HOST=host.docker.internal
 DB_USERNAME=mwtt
 DB_PASSWORD=your_secure_password_here
+DB_PORT=5432
+# Optional: Uncomment if you want to use env var instead of mounted file
+# RAILS_MASTER_KEY=$(cat config/master.key)
 EOF
 
 chmod 600 .env
 ```
 
-**Note:** The `docker-compose.yml` uses `RAILS_MASTER_KEY` from the `.env` file, so Option B works automatically. If you use Option A (copy the file), you can still set `RAILS_MASTER_KEY` in `.env` as a backup, or mount the file as a volume.
-
-**3. Configure external PostgreSQL connection:**
-
-The `docker-compose.yml` is configured to use an **external PostgreSQL server** on your host (not a container). This avoids port conflicts.
-
-**Option A: Using host.docker.internal (recommended)**
+**If you used Option B (environment variable):**
 ```bash
-# Create .env file with database connection
+# Create .env file with master key and database connection
 cat > .env << EOF
 RAILS_MASTER_KEY=$(cat config/master.key)
 DB_HOST=host.docker.internal
@@ -117,7 +171,11 @@ EOF
 chmod 600 .env
 ```
 
-**Option B: Using host's IP address**
+**4. Configure external PostgreSQL connection:**
+
+The `docker-compose.yml` is configured to use an **external PostgreSQL server** on your host (not a container). This avoids port conflicts.
+
+**Option B: Using host's IP address (if host.docker.internal doesn't work)**
 ```bash
 # Find your host's Docker bridge IP (usually 172.17.0.1)
 ip addr show docker0 | grep inet
@@ -174,19 +232,19 @@ EDITOR="nano" bin/rails credentials:edit
 #   port: 5432
 ```
 
-**5. Build and start services:**
+**6. Build and start services:**
 ```bash
 # Build the Docker images (this copies code into the image)
-docker-compose build
+docker compose build
 
 # Start services in background
-docker-compose up -d
+docker compose up -d
 
 # Check status
-docker-compose ps
+docker compose ps
 ```
 
-**6. Prepare external PostgreSQL database:**
+**7. Prepare external PostgreSQL database:**
 ```bash
 # On the host (not in Docker), create database and user
 sudo -u postgres psql
@@ -198,26 +256,23 @@ GRANT ALL PRIVILEGES ON DATABASE mwtt_production TO mwtt;
 \q
 ```
 
-**7. Run database setup in container:**
+**8. Run database setup in container:**
 ```bash
 # Create database and run migrations (from Docker container)
-docker-compose exec web bin/rails db:create
-docker-compose exec web bin/rails db:migrate
+docker compose exec web bin/rails db:create
+docker compose exec web bin/rails db:migrate
 
 # (Optional) Seed database
-docker-compose exec web bin/rails db:seed
+docker compose exec web bin/rails db:seed
 ```
 
-**8. View logs:**
+**9. View logs:**
 ```bash
 # View all logs
-docker-compose logs -f
+docker compose logs -f
 
 # View only web logs
-docker-compose logs -f web
-
-# View only database logs
-docker-compose logs -f db
+docker compose logs -f web
 ```
 
 ### Testing Database Connection:
@@ -225,10 +280,10 @@ docker-compose logs -f db
 Before starting the web service, test the connection:
 ```bash
 # Test connection from container to host PostgreSQL
-docker-compose run --rm web bin/rails db:version
+docker compose run --rm web bin/rails db:version
 
 # Or test with psql from container (if installed)
-docker-compose run --rm web sh -c "PGPASSWORD=\$DB_PASSWORD psql -h \$DB_HOST -U \$DB_USERNAME -d postgres -c 'SELECT version();'"
+docker compose run --rm web sh -c "PGPASSWORD=\$DB_PASSWORD psql -h \$DB_HOST -U \$DB_USERNAME -d postgres -c 'SELECT version();'"
 ```
 
 ### Troubleshooting Database Connection:
@@ -274,43 +329,44 @@ cd /path/to/mwtt
 git pull origin main
 
 # Rebuild the image (includes new code)
-docker-compose build web
+docker compose build web
 
 # Restart the web service
-docker-compose up -d web
+docker compose up -d web
 
 # Run migrations if needed
-docker-compose exec web bin/rails db:migrate
+docker compose exec web bin/rails db:migrate
 ```
 
 ### Useful Commands:
 
 ```bash
 # Stop services
-docker-compose down
+docker compose down
 
 # Stop and remove volumes (⚠️ deletes database!)
-docker-compose down -v
+docker compose down -v
 
 # Restart a service
-docker-compose restart web
+docker compose restart web
 
 # Execute Rails console
-docker-compose exec web bin/rails console
+docker compose exec web bin/rails console
 
 # Execute bash shell in container
-docker-compose exec web bash
+docker compose exec web bash
 
 # View resource usage
-docker-compose stats
+docker compose stats
 ```
 
 ### Notes:
 
-- The code is **baked into the Docker image** during `docker-compose build`
+- The code is **baked into the Docker image** during `docker compose build`
 - You need to **rebuild the image** after pulling code changes
-- Database data persists in Docker volumes (`postgres_data`, `storage_data`)
+- Database data persists in Docker volumes (`storage_data`)
 - The `.env` file stores secrets (make sure it's in `.gitignore`)
+- **Command syntax:** Use `docker compose` (v2) or `docker-compose` (v1) depending on your installation
 
 ---
 
