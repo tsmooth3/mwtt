@@ -10,7 +10,11 @@ services:
     environment:
       RAILS_ENV: production
       # Rails will use RAILS_MASTER_KEY env var if set, otherwise look for config/master.key file
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      # Since we're mounting master.key below, we don't need RAILS_MASTER_KEY env var
+      # Uncomment the next line if you prefer using RAILS_MASTER_KEY from .env instead:
+      # RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      # Port for the web server (defaults to 3000 if not set)
+      PORT: ${PORT:-3000}
     volumes:
       # Mount storage directory for SQLite database and Active Storage files
       - ./storage:/rails/storage

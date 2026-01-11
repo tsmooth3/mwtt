@@ -139,7 +139,7 @@ cat config/master.key
 
 **3. Create .env file with configuration:**
 
-Create a `.env` file with your database connection and Rails master key:
+Create a `.env` file with your database connection, Rails master key, and web server port:
 
 **If you used Option A (copied master.key file):**
 ```bash
@@ -150,6 +150,8 @@ DB_HOST=host.docker.internal
 DB_USERNAME=mwtt
 DB_PASSWORD=your_secure_password_here
 DB_PORT=5432
+# Web server port (defaults to 3000 if not set)
+PORT=3000
 # Optional: Uncomment if you want to use env var instead of mounted file
 # RAILS_MASTER_KEY=$(cat config/master.key)
 EOF
@@ -166,6 +168,8 @@ DB_HOST=host.docker.internal
 DB_USERNAME=mwtt
 DB_PASSWORD=your_secure_password_here
 DB_PORT=5432
+# Web server port (defaults to 3000 if not set)
+PORT=3000
 EOF
 
 chmod 600 .env
@@ -443,12 +447,15 @@ docker compose stats
        server_name your-domain.com;
 
        location / {
-           proxy_pass http://127.0.0.1:3000;
+           # Use the PORT from your .env file (defaults to 3000)
+           proxy_pass http://127.0.0.1:${PORT:-3000};
            proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
        }
    }
    ```
+   
+   **Note:** If you changed the `PORT` in your `.env` file, update the `proxy_pass` port number accordingly.
 
 ---
 
