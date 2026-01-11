@@ -16,4 +16,15 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def failure
     redirect_to root_path
   end
+
+  protected
+
+  # Override Devise's redirect path after OAuth sign-in
+  def after_sign_in_path_for(resource)
+    if resource.families.any?
+      super
+    else
+      families_path
+    end
+  end
 end

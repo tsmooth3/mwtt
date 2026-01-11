@@ -23,4 +23,8 @@ class User < ApplicationRecord
   def family_admin?(family)
     family_memberships.find_by(family: family)&.is_admin || false
   end
+
+  def any_family_admin?
+    family_memberships.where(is_admin: true).any?
+  end
 end

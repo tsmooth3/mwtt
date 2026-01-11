@@ -8,12 +8,20 @@ class FamilyMembershipsController < ApplicationController
     end
     
     unless current_user.families.include?(@family)
+      # First person to join becomes admin
+      is_first_member = @family.users.empty?
+      
       FamilyMembership.create!(
         user: current_user,
         family: @family,
-        is_admin: false
+        is_admin: is_first_member
       )
-      redirect_to @family, notice: 'Successfully joined family!'
+      
+      notice_message = is_first_member ? 
+        'Successfully joined family! You are now the admin.' : 
+        'Successfully joined family!'
+      
+      redirect_to @family, notice: notice_message
     else
       redirect_to @family, alert: 'You are already a member of this family.'
     end

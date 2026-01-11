@@ -8,12 +8,12 @@ class SeasonGoalsController < ApplicationController
     @season_goal.goal_count = params[:goal_count].to_i
     
     if @season_goal.save
-      redirect_to dashboard_path, notice: 'Season goal set successfully!'
+      redirect_to dashboard_path(season_id: @season.year), notice: 'Season goal set successfully!'
     else
-      redirect_to dashboard_path, alert: @season_goal.errors.full_messages.join(', ')
+      redirect_to dashboard_path(season_id: @season.year), alert: @season_goal.errors.full_messages.join(', ')
     end
   rescue => e
-    redirect_to dashboard_path, alert: "Error setting goal: #{e.message}"
+    redirect_to dashboard_path(season_id: @season.year), alert: "Error setting goal: #{e.message}"
   end
 
   def edit
@@ -24,7 +24,7 @@ class SeasonGoalsController < ApplicationController
     @season_goal = SeasonGoal.find(params[:id])
     
     if @season_goal.update(season_goal_params)
-      redirect_to dashboard_path, notice: 'Season goal updated successfully!'
+      redirect_to dashboard_path(season_id: @season_goal.season.year), notice: 'Season goal updated successfully!'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -33,7 +33,7 @@ class SeasonGoalsController < ApplicationController
   private
 
   def ensure_family_admin
-    unless current_family && current_user.family_admin?(current_family)
+    unless current_user.any_family_admin?
       redirect_to dashboard_path, alert: 'Only family admins can set goals.'
     end
   end

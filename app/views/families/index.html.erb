@@ -4,6 +4,14 @@
     <%= link_to "Create New Family", new_family_path, class: "px-3 md:px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md hover:bg-red-500 whitespace-nowrap shadow-md hover:shadow-lg transition-all font-medium" %>
   </div>
 
+  <% unless @user_families.any? %>
+    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-900/90 to-yellow-800/90 border-2 border-yellow-500 rounded-lg">
+      <p class="text-yellow-100 font-medium">
+        👋 Welcome! To get started, please join an existing family or create a new one.
+      </p>
+    </div>
+  <% end %>
+
   <% if @user_families.any? %>
     <div class="mb-8">
       <h2 class="text-xl font-semibold mb-4">Your Families</h2>
