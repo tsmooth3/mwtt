@@ -1,24 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:16
-    container_name: mwtt-db
-    environment:
-      POSTGRES_DB: mwtt_production
-      POSTGRES_USER: ${DB_USERNAME:-mwtt}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "127.0.0.1:5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-mwtt}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
   web:
     build:
       context: .
@@ -28,22 +10,29 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-      DATABASE_URL: postgresql://${DB_USERNAME:-mwtt}:${DB_PASSWORD}@db:5432/mwtt_production
-      # Optional: Set these if you want to override database connection
-      # DB_HOST: db
-      # DB_USERNAME: ${DB_USERNAME:-mwtt}
-      # DB_PASSWORD: ${DB_PASSWORD}
+      # Database connection - uses external PostgreSQL on host
+      # Option 1: Use host.docker.internal (works on Docker Desktop and some Linux setups)
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      # Option 2: Use host's IP address (if host.docker.internal doesn't work)
+      # DB_HOST: ${DB_HOST:-172.17.0.1}
+      # Option 3: Use network_mode: host (see below) and set DB_HOST to localhost
+      DB_USERNAME: ${DB_USERNAME:-mwtt}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT:-5432}
+      # Or use full DATABASE_URL instead of individual variables
+      # DATABASE_URL: postgresql://${DB_USERNAME:-mwtt}:${DB_PASSWORD}@${DB_HOST:-host.docker.internal}:${DB_PORT:-5432}/mwtt_production
     volumes:
       - storage_data:/rails/storage
     ports:
       - "80:80"
-    depends_on:
-      db:
-        condition: service_healthy
+    # Option: Uncomment below to use host network (allows direct localhost access)
+    # network_mode: host
+    # If using network_mode: host, remove the ports section above
     restart: unless-stopped
+    # Add extra_hosts if host.docker.internal doesn't work
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
-  postgres_data:
-    driver: local
   storage_data:
     driver: local

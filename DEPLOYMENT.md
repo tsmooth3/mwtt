@@ -99,7 +99,69 @@ chmod 600 .env
 
 **Note:** The `docker-compose.yml` uses `RAILS_MASTER_KEY` from the `.env` file, so Option B works automatically. If you use Option A (copy the file), you can still set `RAILS_MASTER_KEY` in `.env` as a backup, or mount the file as a volume.
 
-**3. Edit Rails credentials (if needed):**
+**3. Configure external PostgreSQL connection:**
+
+The `docker-compose.yml` is configured to use an **external PostgreSQL server** on your host (not a container). This avoids port conflicts.
+
+**Option A: Using host.docker.internal (recommended)**
+```bash
+# Create .env file with database connection
+cat > .env << EOF
+RAILS_MASTER_KEY=$(cat config/master.key)
+DB_HOST=host.docker.internal
+DB_USERNAME=mwtt
+DB_PASSWORD=your_secure_password_here
+DB_PORT=5432
+EOF
+
+chmod 600 .env
+```
+
+**Option B: Using host's IP address**
+```bash
+# Find your host's Docker bridge IP (usually 172.17.0.1)
+ip addr show docker0 | grep inet
+
+# Or use your server's actual IP
+cat > .env << EOF
+RAILS_MASTER_KEY=$(cat config/master.key)
+DB_HOST=172.17.0.1  # or your server's IP
+DB_USERNAME=mwtt
+DB_PASSWORD=your_secure_password_here
+DB_PORT=5432
+EOF
+
+chmod 600 .env
+```
+
+**Option C: Using network_mode: host**
+If `host.docker.internal` doesn't work, you can use host networking:
+```bash
+# Edit docker-compose.yml and uncomment: network_mode: host
+# Then use localhost in .env
+cat > .env << EOF
+RAILS_MASTER_KEY=$(cat config/master.key)
+DB_HOST=localhost
+DB_USERNAME=mwtt
+DB_PASSWORD=your_secure_password_here
+DB_PORT=5432
+EOF
+```
+
+**Important:** Make sure your PostgreSQL server allows connections from Docker:
+```bash
+# Edit PostgreSQL config (usually /etc/postgresql/*/main/pg_hba.conf)
+# Add line to allow Docker network:
+host    all    all    172.17.0.0/16    md5
+
+# Or if using network_mode: host, ensure localhost is allowed:
+host    all    all    127.0.0.1/32    md5
+
+# Restart PostgreSQL
+sudo systemctl restart postgresql
+```
+
+**4. Edit Rails credentials (optional - if you prefer credentials over .env):**
 ```bash
 # On the server, edit credentials to add production database settings
 EDITOR="nano" bin/rails credentials:edit
@@ -108,24 +170,11 @@ EDITOR="nano" bin/rails credentials:edit
 # database:
 #   username: mwtt
 #   password: your_secure_password_here
-#   host: db  # or localhost if external
+#   host: host.docker.internal  # or localhost if using network_mode: host
 #   port: 5432
 ```
 
-**4. Create environment file (if using .env for other variables):**
-```bash
-# If you're not using Rails credentials for everything, create .env
-cat > .env << EOF
-RAILS_MASTER_KEY=$(cat config/master.key)
-# Only add these if NOT using Rails credentials for database
-# DB_USERNAME=mwtt
-# DB_PASSWORD=your_secure_password_here
-EOF
-
-chmod 600 .env
-```
-
-**3. Build and start services:**
+**5. Build and start services:**
 ```bash
 # Build the Docker images (this copies code into the image)
 docker-compose build
@@ -137,9 +186,21 @@ docker-compose up -d
 docker-compose ps
 ```
 
-**4. Run database setup:**
+**6. Prepare external PostgreSQL database:**
 ```bash
-# Create database and run migrations
+# On the host (not in Docker), create database and user
+sudo -u postgres psql
+
+# In PostgreSQL console:
+CREATE DATABASE mwtt_production;
+CREATE USER mwtt WITH PASSWORD 'your_secure_password_here';
+GRANT ALL PRIVILEGES ON DATABASE mwtt_production TO mwtt;
+\q
+```
+
+**7. Run database setup in container:**
+```bash
+# Create database and run migrations (from Docker container)
 docker-compose exec web bin/rails db:create
 docker-compose exec web bin/rails db:migrate
 
@@ -147,7 +208,7 @@ docker-compose exec web bin/rails db:migrate
 docker-compose exec web bin/rails db:seed
 ```
 
-**5. View logs:**
+**8. View logs:**
 ```bash
 # View all logs
 docker-compose logs -f
@@ -158,6 +219,50 @@ docker-compose logs -f web
 # View only database logs
 docker-compose logs -f db
 ```
+
+### Testing Database Connection:
+
+Before starting the web service, test the connection:
+```bash
+# Test connection from container to host PostgreSQL
+docker-compose run --rm web bin/rails db:version
+
+# Or test with psql from container (if installed)
+docker-compose run --rm web sh -c "PGPASSWORD=\$DB_PASSWORD psql -h \$DB_HOST -U \$DB_USERNAME -d postgres -c 'SELECT version();'"
+```
+
+### Troubleshooting Database Connection:
+
+**If connection fails:**
+1. **Check PostgreSQL is listening on the right interface:**
+   ```bash
+   sudo netstat -tlnp | grep 5432
+   # Should show 0.0.0.0:5432 or 127.0.0.1:5432
+   ```
+
+2. **Check PostgreSQL config (`postgresql.conf`):**
+   ```bash
+   # Should have: listen_addresses = '*' or 'localhost'
+   grep listen_addresses /etc/postgresql/*/main/postgresql.conf
+   ```
+
+3. **Check pg_hba.conf allows Docker network:**
+   ```bash
+   # Add this line if missing:
+   host    all    all    172.17.0.0/16    md5
+   ```
+
+4. **Try different DB_HOST values:**
+   - `host.docker.internal` (Docker Desktop, newer Docker)
+   - `172.17.0.1` (default Docker bridge IP)
+   - Your server's actual IP address
+   - `localhost` (if using `network_mode: host`)
+
+5. **Check firewall rules:**
+   ```bash
+   # Allow Docker network to access PostgreSQL
+   sudo ufw allow from 172.17.0.0/16 to any port 5432
+   ```
 
 ### Updating the Application:
 
