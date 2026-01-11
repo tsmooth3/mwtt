@@ -6,7 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: mwtt-web
-    command: ./bin/thrust ./bin/rails server
+    # Use rails server directly - it respects the PORT env var (Thrust defaults to port 80 which requires root)
+    command: ./bin/rails server
     environment:
       RAILS_ENV: production
       # Rails will use RAILS_MASTER_KEY env var if set, otherwise look for config/master.key file
