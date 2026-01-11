@@ -52,53 +52,160 @@ Kamal is Rails 8's modern deployment tool. It handles:
 
 **Best for:** Simple single-server deployments
 
-### Create `docker-compose.yml`:
+The `docker-compose.yml` file is already created in the repository. The Dockerfile copies your code into the Docker image during the build process, so you need to clone the repo on your Docker server.
 
-```yaml
-version: '3.8'
+### Deployment Workflow:
 
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: mwtt_production
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "127.0.0.1:5432:5432"
+**1. On your Docker server, clone the repository:**
+```bash
+# SSH into your Docker server
+ssh user@your-docker-server
 
-  web:
-    build: .
-    command: ./bin/thrust ./bin/rails server
-    environment:
-      RAILS_ENV: production
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-      DATABASE_URL: postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:5432/mwtt_production
-    volumes:
-      - storage_data:/rails/storage
-    ports:
-      - "80:80"
-    depends_on:
-      - db
+# Clone the repo (or navigate to existing clone)
+git clone git@github.com:tsmooth3/mwtt.git
+cd mwtt
 
-volumes:
-  postgres_data:
-  storage_data:
+# Pull latest changes (for updates)
+git pull origin main
 ```
 
-### Deploy:
+**2. Set up Rails credentials:**
+
+Rails credentials work in production! The encrypted file (`config/credentials.yml.enc`) is already in the repo. You just need to copy the master key to decrypt it.
+
+**Option A: Copy master.key file (recommended)**
 ```bash
-# Build and start
+# On your local machine, securely copy the master key to the server
+scp config/master.key user@your-docker-server:/path/to/mwtt/config/master.key
+
+# On the server, set proper permissions
+chmod 600 config/master.key
+```
+
+**Option B: Use RAILS_MASTER_KEY environment variable**
+```bash
+# On your local machine, get the master key value
+cat config/master.key
+
+# On the server, create .env file with the master key
+cat > .env << EOF
+RAILS_MASTER_KEY=<paste_the_master_key_value_here>
+DB_USERNAME=mwtt
+DB_PASSWORD=your_secure_password_here
+EOF
+
+chmod 600 .env
+```
+
+**Note:** The `docker-compose.yml` uses `RAILS_MASTER_KEY` from the `.env` file, so Option B works automatically. If you use Option A (copy the file), you can still set `RAILS_MASTER_KEY` in `.env` as a backup, or mount the file as a volume.
+
+**3. Edit Rails credentials (if needed):**
+```bash
+# On the server, edit credentials to add production database settings
+EDITOR="nano" bin/rails credentials:edit
+
+# Add production database credentials:
+# database:
+#   username: mwtt
+#   password: your_secure_password_here
+#   host: db  # or localhost if external
+#   port: 5432
+```
+
+**4. Create environment file (if using .env for other variables):**
+```bash
+# If you're not using Rails credentials for everything, create .env
+cat > .env << EOF
+RAILS_MASTER_KEY=$(cat config/master.key)
+# Only add these if NOT using Rails credentials for database
+# DB_USERNAME=mwtt
+# DB_PASSWORD=your_secure_password_here
+EOF
+
+chmod 600 .env
+```
+
+**3. Build and start services:**
+```bash
+# Build the Docker images (this copies code into the image)
+docker-compose build
+
+# Start services in background
 docker-compose up -d
 
-# Run migrations
+# Check status
+docker-compose ps
+```
+
+**4. Run database setup:**
+```bash
+# Create database and run migrations
+docker-compose exec web bin/rails db:create
 docker-compose exec web bin/rails db:migrate
 
-# View logs
-docker-compose logs -f web
+# (Optional) Seed database
+docker-compose exec web bin/rails db:seed
 ```
+
+**5. View logs:**
+```bash
+# View all logs
+docker-compose logs -f
+
+# View only web logs
+docker-compose logs -f web
+
+# View only database logs
+docker-compose logs -f db
+```
+
+### Updating the Application:
+
+When you make changes and push to git:
+
+```bash
+# On your Docker server
+cd /path/to/mwtt
+git pull origin main
+
+# Rebuild the image (includes new code)
+docker-compose build web
+
+# Restart the web service
+docker-compose up -d web
+
+# Run migrations if needed
+docker-compose exec web bin/rails db:migrate
+```
+
+### Useful Commands:
+
+```bash
+# Stop services
+docker-compose down
+
+# Stop and remove volumes (⚠️ deletes database!)
+docker-compose down -v
+
+# Restart a service
+docker-compose restart web
+
+# Execute Rails console
+docker-compose exec web bin/rails console
+
+# Execute bash shell in container
+docker-compose exec web bash
+
+# View resource usage
+docker-compose stats
+```
+
+### Notes:
+
+- The code is **baked into the Docker image** during `docker-compose build`
+- You need to **rebuild the image** after pulling code changes
+- Database data persists in Docker volumes (`postgres_data`, `storage_data`)
+- The `.env` file stores secrets (make sure it's in `.gitignore`)
 
 ---
 

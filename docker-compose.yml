@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: mwtt-db
+    environment:
+      POSTGRES_DB: mwtt_production
+      POSTGRES_USER: ${DB_USERNAME:-mwtt}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-mwtt}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mwtt-web
+    command: ./bin/thrust ./bin/rails server
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      DATABASE_URL: postgresql://${DB_USERNAME:-mwtt}:${DB_PASSWORD}@db:5432/mwtt_production
+      # Optional: Set these if you want to override database connection
+      # DB_HOST: db
+      # DB_USERNAME: ${DB_USERNAME:-mwtt}
+      # DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - storage_data:/rails/storage
+    ports:
+      - "80:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  storage_data:
+    driver: local

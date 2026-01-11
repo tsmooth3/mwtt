@@ -59,9 +59,11 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: mwtt
-    username: <%= Rails.application.credentials.dig(:database, :username) || ENV["MWTT_DATABASE_USERNAME"] || "root" %>
-    password: <%= Rails.application.credentials.dig(:database, :password) || ENV["MWTT_DATABASE_PASSWORD"] %>
+    database: mwtt_production
+    username: <%= Rails.application.credentials.dig(:database, :username) || ENV["DB_USERNAME"] || "mwtt" %>
+    password: <%= Rails.application.credentials.dig(:database, :password) || ENV["DB_PASSWORD"] %>
+    host: <%= Rails.application.credentials.dig(:database, :host) || ENV["DB_HOST"] || "db" %>
+    port: <%= Rails.application.credentials.dig(:database, :port) || ENV["DB_PORT"] || "5432" %>
   # cache:
   #   <<: *primary_production
   #   database: mwtt_production_cache
