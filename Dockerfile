@@ -67,7 +67,7 @@ RUN if ! getent group rails > /dev/null 2>&1; then \
       useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash; \
     fi && \
     mkdir -p db log storage tmp && \
-    chown -R rails:rails db log storage tmp
+    chown rails:rails db log storage tmp
 USER 1000:1000
 
 # Entrypoint prepares the database.
