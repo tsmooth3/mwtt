@@ -23,18 +23,18 @@ default: &default
 development:
   <<: *default
   database: mwtt_development
-  username: <%=  Rails.application.credentials.dig(:database, :username) || "root" %>
-  password: <%=  Rails.application.credentials.dig(:database, :password) || "" %>
-  host: <%=  Rails.application.credentials.dig(:database, :host) || "localhost" %>
-  port: <%=  Rails.application.credentials.dig(:database, :port) || "5432" %>
+  username: <%=  Rails.application.credentials.dig(:devdatabase, :username) || "root" %>
+  password: <%=  Rails.application.credentials.dig(:devdatabase, :password) || "" %>
+  host: <%=  Rails.application.credentials.dig(:devdatabase, :host) || "localhost" %>
+  port: <%=  Rails.application.credentials.dig(:devdatabase, :port) || "5432" %>
 
 test:
   <<: *default
   database: mwtt_test
-  username: <%=  Rails.application.credentials.dig(:database, :username) || "root" %>
-  password: <%=  Rails.application.credentials.dig(:database, :password) || "" %>
-  host: <%=  Rails.application.credentials.dig(:database, :host) || "localhost" %>
-  port: <%=  Rails.application.credentials.dig(:database, :port) || "5432" %>
+  username: <%=  Rails.application.credentials.dig(:devdatabase, :username) || "root" %>
+  password: <%=  Rails.application.credentials.dig(:devdatabase, :password) || "" %>
+  host: <%=  Rails.application.credentials.dig(:devdatabase, :host) || "localhost" %>
+  port: <%=  Rails.application.credentials.dig(:devdatabase, :port) || "5432" %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
