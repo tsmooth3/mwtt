@@ -1,0 +1,40 @@
+<div class="w-full">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-red-400">🎄 Families</h1>
+    <%= link_to "Create New Family", new_family_path, class: "px-3 md:px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md hover:bg-red-500 whitespace-nowrap shadow-md hover:shadow-lg transition-all font-medium" %>
+  </div>
+
+  <% if @user_families.any? %>
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Your Families</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% @user_families.each do |family| %>
+        <div class="border-2 border-green-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold mb-2 text-green-400"><%= family.name %></h3>
+          <p class="text-sm text-green-300 mb-4">Members: <%= family.users.count %></p>
+          <%= link_to "View Family", family_path(family), class: "text-red-400 hover:text-red-300 font-semibold" %>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div>
+    <h2 class="text-xl font-semibold mb-4">All Families</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% @families.each do |family| %>
+        <div class="border-2 border-red-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 hover:shadow-lg transition-shadow">
+          <h3 class="text-lg font-semibold mb-2 text-red-400"><%= family.name %></h3>
+          <p class="text-sm text-red-300 mb-4">Members: <%= family.users.count %></p>
+          <% if current_user.families.include?(family) %>
+            <span class="text-green-400 text-sm font-semibold">✓ You are a member</span>
+          <% elsif current_user.families.any? %>
+            <span class="text-gray-500 text-sm">---</span>
+          <% else %>
+            <%= button_to "Join Family", family_family_memberships_path(family), method: :post, data: { turbo_method: :post }, class: "text-red-400 hover:text-red-300 font-semibold" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

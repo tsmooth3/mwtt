@@ -1,0 +1,37 @@
+<div class="w-full max-w-md mx-auto">
+  <h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-red-400">Edit Tree Entry</h1>
+
+  <%= form_with model: @tree_entry, local: true, class: "space-y-4" do |f| %>
+    <% if @tree_entry.errors.any? %>
+      <div class="bg-red-900/80 border-2 border-red-500 text-red-100 px-4 py-3 rounded mb-4">
+        <ul>
+          <% @tree_entry.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :family_id, "Family", class: "block text-sm font-medium text-gray-300 mb-1" %>
+      <%= f.collection_select :family_id, @families, :id, :name, 
+          { prompt: "Select a family..." }, 
+          { class: "w-full px-3 py-2 border-2 border-red-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-400 bg-gray-800 text-gray-100" } %>
+    </div>
+
+    <div>
+      <%= f.label :entry_date, "Date", class: "block text-sm font-medium text-gray-300 mb-1" %>
+      <%= f.date_field :entry_date, class: "w-full px-3 py-2 border-2 border-red-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-400 bg-gray-800 text-gray-100" %>
+    </div>
+
+    <div>
+      <%= f.label :tree_count, "Number of Trees", class: "block text-sm font-medium text-gray-300 mb-1" %>
+      <%= f.number_field :tree_count, min: 1, step: 1, class: "w-full px-3 py-2 border-2 border-red-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-400 bg-gray-800 text-gray-100" %>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+      <%= f.submit "Update Entry", class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-500 shadow-md" %>
+      <%= link_to "Cancel", tree_entries_path, class: "px-4 py-2 border-2 border-gray-600 rounded-md hover:bg-gray-700 text-center text-gray-200" %>
+    </div>
+  <% end %>
+</div>

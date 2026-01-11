@@ -1,0 +1,43 @@
+<div class="w-full">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-red-400"><%= @family.name %></h1>
+    <%= link_to "Back to Families", families_path, class: "text-sm md:text-base text-blue-400 hover:text-blue-300" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+    <div class="border-2 border-green-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
+      <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-green-400">Members</h2>
+      <ul class="space-y-2">
+        <% @family.users.each do |user| %>
+          <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0">
+            <span class="text-sm md:text-base truncate max-w-full text-gray-100"><%= user.email %></span>
+            <% if @family.family_memberships.find_by(user: user)&.is_admin %>
+              <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded whitespace-nowrap">Admin</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div class="border-2 border-red-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
+      <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-red-400">Your Status</h2>
+      <% if @is_member %>
+        <p class="text-sm md:text-base text-green-400 mb-2">✓ You are a member</p>
+        <% if @is_admin %>
+          <p class="text-sm md:text-base text-green-300 mb-4">✓ You are an admin</p>
+        <% end %>
+        <% unless @is_admin %>
+          <% membership = current_user.family_memberships.find_by(family: @family) %>
+          <% if membership %>
+            <%= button_to "Leave Family", family_family_membership_path(@family, membership), method: :delete, data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to leave this family?" }, class: "w-full sm:w-auto px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md hover:bg-red-500 shadow-md" %>
+          <% end %>
+        <% end %>
+      <% elsif current_user.families.any? %>
+        <p class="text-sm md:text-base text-gray-400 mb-2">You are already a member of another family.</p>
+        <p class="text-xs md:text-sm text-gray-500">Leave your current family to join this one.</p>
+      <% else %>
+        <%= button_to "Join Family", family_family_memberships_path(@family), method: :post, data: { turbo_method: :post }, class: "w-full sm:w-auto px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-md hover:bg-green-500 shadow-md" %>
+      <% end %>
+    </div>
+  </div>
+</div>

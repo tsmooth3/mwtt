@@ -1,0 +1,2 @@
+module SeasonGoalsHelper
+end

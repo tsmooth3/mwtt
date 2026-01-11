@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Mwtt" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%# Prevent caching in development to ensure CSS updates are visible %>
+    <% if Rails.env.development? %>
+      <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+      <meta http-equiv="Pragma" content="no-cache">
+      <meta http-equiv="Expires" content="0">
+    <% end %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <style>
+      /* Force dark mode as fallback */
+      html, body {
+        background-color: #111827 !important;
+        color: #f3f4f6 !important;
+      }
+      
+      /* Flash message animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
+    </style>
+    <%= javascript_importmap_tags %>
+    
+    <%# Google Charts - load first %>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      // Load Google Charts
+      google.charts.load('current', {'packages':['corechart']});
+    </script>
+    <%# Load Chartkick directly to avoid preload warnings %>
+    <script src="<%= asset_path('chartkick.js') %>"></script>
+    <script>
+      // Configure Chartkick to use Google Charts after both are loaded
+      function configureChartkick() {
+        if (typeof Chartkick !== 'undefined' && typeof google !== 'undefined') {
+          Chartkick.configure({adapter: 'googleCharts'});
+          console.log('Chartkick configured with Google Charts');
+          
+          // Ensure Google Charts is ready
+          google.charts.setOnLoadCallback(function() {
+            console.log('Google Charts ready, charts should render');
+          });
+        } else {
+          // Retry if not ready yet
+          setTimeout(configureChartkick, 50);
+        }
+      }
+      
+      // Configure after page loads
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', configureChartkick);
+      } else {
+        configureChartkick();
+      }
+      
+      // Re-configure on Turbo navigation
+      document.addEventListener('turbo:load', configureChartkick);
+    </script>
+  </head>
+
+  <body class="bg-gray-900 text-gray-100" style="background-color: #111827 !important; color: #f3f4f6 !important;">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-red-800 via-red-700 to-green-800 shadow-lg border-b border-red-600">
+      <div class="container mx-auto px-4 relative">
+        <div class="flex items-center justify-between h-16">
+          <%= link_to root_path, class: "flex items-center space-x-2" do %>
+            <span class="text-xl font-bold text-white">🎄 MWTT</span>
+          <% end %>
+          
+          <% if user_signed_in? %>
+            <div class="flex items-center space-x-6">
+              <div class="hidden md:flex items-center space-x-6">
+                <%= link_to "Entries", tree_entries_path, class: "text-sm font-medium text-white hover:text-yellow-300 transition-colors" %>
+                <%= link_to "Families", families_path, class: "text-sm font-medium text-white hover:text-yellow-300 transition-colors" %>
+              </div>
+              <span class="hidden sm:block text-xs text-white/90 truncate max-w-[120px]"><%= current_user.email %></span>
+              <%= link_to "Logout", destroy_user_session_path, data: { turbo_method: :delete }, class: "px-3 py-1.5 text-xs font-medium text-white hover:text-yellow-300 hover:bg-white/20 rounded transition-colors" %>
+            </div>
+          <% else %>
+            <div class="flex items-center space-x-6">
+              <div class="hidden md:flex items-center space-x-6">
+                <%= link_to "Entries", tree_entries_path, class: "text-sm font-medium text-white hover:text-yellow-300 transition-colors" %>
+                <%= link_to "Families", families_path, class: "text-sm font-medium text-white hover:text-yellow-300 transition-colors" %>
+              </div>
+              <div class="flex items-center space-x-3">
+                <%= link_to "Login", new_user_session_path, class: "px-4 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-colors" %>
+                <%= link_to "Sign Up", new_user_registration_path, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white hover:bg-yellow-300 rounded-md transition-colors" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <%# Mobile menu %>
+        <% if user_signed_in? %>
+          <div class="md:hidden border-t border-white/20 py-2">
+            <div class="flex flex-col space-y-1">
+              <%= link_to "Entries", tree_entries_path, class: "px-4 py-2 text-sm text-white hover:bg-white/20 hover:text-yellow-300" %>
+              <%= link_to "Families", families_path, class: "px-4 py-2 text-sm text-white hover:bg-white/20 hover:text-yellow-300" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </nav>
+
+    <%# Add padding to body to account for fixed nav %>
+    <div class="pt-20 md:pt-16">
+      <%# Handle all flash message types with theme-appropriate styling %>
+      <% flash.each do |type, message| %>
+        <% next if message.blank? %>
+        <% 
+          # Map flash types to theme colors
+          case type.to_s
+          when 'notice', 'success'
+            bg_class = 'bg-gradient-to-r from-green-900/90 to-green-800/90'
+            border_class = 'border-green-500'
+            text_class = 'text-green-100'
+            icon_class = 'text-green-400'
+            icon_path = 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+          when 'alert', 'error', 'danger'
+            bg_class = 'bg-gradient-to-r from-red-900/90 to-red-800/90'
+            border_class = 'border-red-500'
+            text_class = 'text-red-100'
+            icon_class = 'text-red-400'
+            icon_path = 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+          else
+            # Default to info/warning styling (yellow/orange)
+            bg_class = 'bg-gradient-to-r from-yellow-900/90 to-yellow-800/90'
+            border_class = 'border-yellow-500'
+            text_class = 'text-yellow-100'
+            icon_class = 'text-yellow-400'
+            icon_path = 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
+          end
+        %>
+        <div class="container mx-auto px-4 mt-4 animate-fade-in">
+          <div class="<%= bg_class %> border-2 <%= border_class %> <%= text_class %> px-4 py-3 rounded-lg shadow-lg relative flex items-center space-x-3" role="alert" style="background: <%= type.to_s.in?(%w[alert error danger]) ? 'linear-gradient(to right, rgb(127 29 29 / 0.9), rgb(153 27 27 / 0.9))' : 'linear-gradient(to right, rgb(20 83 45 / 0.9), rgb(22 101 52 / 0.9))' %> !important; border-color: <%= type.to_s.in?(%w[alert error danger]) ? '#ef4444' : '#22c55e' %> !important; color: <%= type.to_s.in?(%w[alert error danger]) ? '#fee2e2' : '#dcfce7' %> !important;">
+            <svg class="w-5 h-5 flex-shrink-0 <%= icon_class %>" fill="currentColor" viewBox="0 0 20 20" style="color: <%= type.to_s.in?(%w[alert error danger]) ? '#f87171' : '#4ade80' %> !important;">
+              <path fill-rule="evenodd" d="<%= icon_path %>" clip-rule="evenodd"/>
+            </svg>
+            <span class="flex-1 font-medium"><%= message %></span>
+          </div>
+        </div>
+      <% end %>
+
+      <main class="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        <%= yield %>
+      </main>
+    </div>
+
+    <script>
+      // Handle Turbo navigation - re-render charts after page loads
+      document.addEventListener('turbo:load', function() {
+        // Wait a bit for Chartkick to be ready
+        setTimeout(function() {
+          if (typeof Chartkick !== 'undefined' && typeof google !== 'undefined') {
+            // Charts should render automatically, but we can force a redraw if needed
+            var chartElements = document.querySelectorAll('[data-chartkick]');
+            chartElements.forEach(function(el) {
+              // Chartkick will handle rendering automatically
+            });
+          }
+        }, 100);
+      });
+    </script>
+  </body>
+</html>

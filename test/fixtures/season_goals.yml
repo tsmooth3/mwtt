@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  family: one
+  season: one
+  goal_count: 1
+
+two:
+  family: two
+  season: two
+  goal_count: 1
