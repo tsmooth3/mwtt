@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  family: one
+  season: one
+  entry_date: 2026-01-06
+  tree_count: 1
+
+two:
+  user: two
+  family: two
+  season: two
+  entry_date: 2026-01-06
+  tree_count: 1
