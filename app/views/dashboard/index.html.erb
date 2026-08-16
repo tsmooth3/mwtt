@@ -1,79 +1,108 @@
-<div class="w-full">
-  <div class="mb-6 md:mb-8">
-    <div class="text-center mb-6">
-      <h1 class="text-3xl md:text-4xl font-bold text-red-400 mb-4">🎄 Mid-Winter Tree Tracker</h1>
-      <%= link_to "New Entry", new_tree_entry_path, class: "inline-block px-6 py-3 text-base md:text-lg bg-green-600 text-white rounded-lg hover:bg-green-500 shadow-lg hover:shadow-xl transition-all font-semibold" %>
+<div class="w-full space-y-6 md:space-y-8">
+  <%# Top Header & Call to Action %>
+  <div class="text-center py-4 md:py-6">
+    <div class="inline-block text-[11px] font-bold tracking-[2.5px] uppercase text-[#c4a35a] mb-2">
+      A SPARE PAIR OF PROJECTS · MWTT
     </div>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-[#f4efe4] tracking-tight mb-4 flex items-center justify-center gap-2">
+      <span>🎄</span> <span>Mid-Winter Tree Tracker</span>
+    </h1>
+    <%= link_to new_tree_entry_path, class: "inline-flex items-center gap-2 px-6 py-3 text-base md:text-lg bg-[#16a34a] hover:bg-[#15803d] text-white rounded-xl font-bold shadow-lg shadow-green-950/40 hover:shadow-xl transition-all transform hover:-translate-y-0.5" do %>
+      <span>+</span> <span>Log New Entry</span>
+    <% end %>
   </div>
 
   <% unless current_family %>
-    <div class="bg-yellow-900/60 border-2 border-yellow-600 text-yellow-200 px-4 py-3 rounded-lg mb-6 shadow-md">
-      <p>You need to join or create a family to start tracking trees. <%= link_to "Go to Families", families_path, class: "underline font-semibold text-yellow-300 hover:text-yellow-100" %></p>
+    <div class="bg-[#152a48] border-2 border-[#c4a35a] text-[#f4efe4] px-5 py-4 rounded-xl shadow-md">
+      <p class="text-sm">
+        👋 <strong class="text-[#e0c57a]">Get Started:</strong> You need to join or create a family to start tracking trees. 
+        <%= link_to "Go to Families →", families_path, class: "underline font-bold text-[#c4a35a] hover:text-[#e0c57a] ml-1" %>
+      </p>
     </div>
   <% end %>
 
-  <div class="mb-4 md:mb-6">
-    <label class="block text-sm font-medium text-red-400 mb-2">Select Season:</label>
-    <%= form_with url: dashboard_path, method: :get, local: true, class: "w-full md:w-auto" do |f| %>
+  <%# Season Selector %>
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#152a48]/70 border border-[#1e3a5f] p-3.5 rounded-xl">
+    <label class="text-sm font-semibold text-[#c9bda4] flex items-center gap-2">
+      <span class="text-[#c4a35a]">📅</span> Season:
+    </label>
+    <%= form_with url: dashboard_path, method: :get, local: true, class: "w-full sm:w-auto" do |f| %>
       <%= select_tag :season_id, 
           options_from_collection_for_select(@all_seasons, :year, :year, @selected_season.year),
-          { onchange: "this.form.submit()", class: "w-full md:w-auto px-3 md:px-4 py-2 border-2 border-green-500 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 text-sm md:text-base bg-gray-800 text-gray-100" } %>
+          { onchange: "this.form.submit()", class: "w-full sm:w-48 px-3.5 py-1.5 border border-[#1e3a5f] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#c4a35a] text-sm bg-[#0f1c2e] text-[#f4efe4] font-medium" } %>
     <% end %>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+  <%# Stat Cards Grid %>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
     <% if current_family %>
-      <div class="border-2 border-green-500 rounded-lg p-4 md:p-6 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
-        <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-green-400"><%= current_family.name %> Family Total</h2>
-        <p class="text-3xl md:text-4xl font-bold text-green-300"><%= @family_total %></p>
-        <p class="text-xs md:text-sm text-green-400 mt-2">trees collected in <%= @selected_season.year %></p>
+      <div class="border border-[#16a34a]/60 rounded-2xl p-5 md:p-6 bg-gradient-to-br from-[#152a48] to-[#0f1c2e] shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-[#16a34a]/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base md:text-lg font-bold text-[#4ade80] flex items-center gap-2">
+            <span>🌲</span> <%= current_family.name %> Family
+          </h2>
+          <span class="text-xs bg-[#16a34a]/20 text-[#4ade80] border border-[#16a34a]/40 px-2.5 py-0.5 rounded-full font-semibold">Your Family</span>
+        </div>
+        <p class="text-4xl md:text-5xl font-extrabold text-[#4ade80] tracking-tight"><%= @family_total %></p>
+        <p class="text-xs md:text-sm text-[#9eb4d4] mt-2">trees collected in <%= @selected_season.year %></p>
       </div>
     <% end %>
 
-    <div class="border-2 border-red-500 rounded-lg p-4 md:p-6 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
-      <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-red-400">Overall Total - <%= @selected_season.year %></h2>
-      <p class="text-3xl md:text-4xl font-bold text-red-300"><%= @overall_total %></p>
-      <p class="text-xs md:text-sm text-red-400 mt-2">trees collected by all families</p>
+    <div class="border border-[#b54a3a]/60 rounded-2xl p-5 md:p-6 bg-gradient-to-br from-[#152a48] to-[#0f1c2e] shadow-xl relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-24 h-24 bg-[#b54a3a]/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base md:text-lg font-bold text-[#f87171] flex items-center gap-2">
+          <span>🌟</span> Overall Total
+        </h2>
+        <span class="text-xs bg-[#b54a3a]/20 text-[#f87171] border border-[#b54a3a]/40 px-2.5 py-0.5 rounded-full font-semibold"><%= @selected_season.year %> Season</span>
+      </div>
+      <p class="text-4xl md:text-5xl font-extrabold text-[#f4efe4] tracking-tight"><%= @overall_total %></p>
+      <p class="text-xs md:text-sm text-[#9eb4d4] mt-2">trees collected across all families</p>
       
       <% if @season_goal %>
-        <div class="mt-4 md:mt-5 pt-3 md:pt-4 border-t border-gray-700">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0 text-xs md:text-sm mb-2 text-red-300">
-            <span class="font-medium">Season Goal: <%= @season_goal.goal_count %> trees</span>
-            <span class="font-semibold text-base md:text-lg"><%= @overall_progress.round(1) %>% Complete</span>
+        <div class="mt-4 pt-4 border-t border-[#1e3a5f]">
+          <div class="flex justify-between items-center text-xs md:text-sm mb-2 text-[#c9bda4]">
+            <span class="font-medium">Goal: <strong class="text-[#f4efe4]"><%= @season_goal.goal_count %></strong> trees</span>
+            <span class="font-bold text-[#e0c57a]"><%= @overall_progress.round(1) %>% Complete</span>
           </div>
-          <div class="w-full bg-gray-700 rounded-full h-4 md:h-5 mb-3 shadow-inner">
-            <div class="bg-gradient-to-r from-green-500 to-green-400 h-4 md:h-5 rounded-full shadow-md transition-all duration-300" style="width: <%= [@overall_progress, 100].min %>%"></div>
+          <div class="w-full bg-[#0f1c2e] border border-[#1e3a5f] rounded-full h-4 overflow-hidden p-0.5">
+            <div class="bg-gradient-to-r from-[#c4a35a] via-[#22c55e] to-[#4ade80] h-full rounded-full transition-all duration-500 shadow-sm" style="width: <%= [@overall_progress, 100].min %>%"></div>
           </div>
           <% if current_user.any_family_admin? %>
-            <div class="text-center mt-2">
-              <%= link_to "✏️ Edit Goal", edit_season_goal_path(@season_goal), class: "inline-block px-4 py-2 text-sm md:text-base text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-lg font-semibold transition-all border border-red-500/50" %>
+            <div class="text-right mt-2">
+              <%= link_to "✏️ Edit Season Goal", edit_season_goal_path(@season_goal), class: "text-xs font-semibold text-[#c4a35a] hover:text-[#e0c57a] transition-colors" %>
             </div>
           <% end %>
         </div>
       <% else %>
-        <div class="mt-4 md:mt-5 pt-3 md:pt-4 border-t border-gray-700">
-          <p class="text-sm md:text-base font-medium text-gray-300 mb-3">🎯 No season goal set yet</p>
+        <div class="mt-4 pt-4 border-t border-[#1e3a5f]">
+          <p class="text-xs md:text-sm text-[#9eb4d4] mb-3">🎯 No season goal set yet</p>
           <% if current_user.any_family_admin? %>
-            <div class="bg-gray-800/50 border-2 border-red-500/50 rounded-lg p-3 md:p-4">
-              <p class="text-xs md:text-sm text-gray-300 mb-3">Set a goal for all families this season:</p>
+            <div class="bg-[#0f1c2e] border border-[#1e3a5f] rounded-xl p-3">
+              <p class="text-xs text-[#c9bda4] mb-2 font-medium">Set a season goal for all families:</p>
               <%= form_with url: season_goals_path, method: :post, local: true, class: "flex flex-col sm:flex-row gap-2" do |f| %>
                 <%= hidden_field_tag :season_id, @selected_season.year %>
-                <%= number_field_tag :goal_count, nil, placeholder: "Enter goal (e.g., 200)", min: 1, step: 1, class: "flex-1 px-4 py-3 border-2 border-gray-600 rounded-lg text-base bg-gray-900 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all" %>
-                <%= f.submit "Set Season Goal", class: "px-6 py-3 bg-red-600 text-white rounded-lg text-base hover:bg-red-500 whitespace-nowrap font-semibold shadow-md transition-all hover:shadow-lg" %>
+                <%= number_field_tag :goal_count, nil, placeholder: "e.g. 200", min: 1, step: 1, class: "flex-1 px-3 py-2 border border-[#1e3a5f] rounded-lg text-sm bg-[#152a48] text-[#f4efe4] placeholder-[#7a8ea8] focus:outline-none focus:ring-2 focus:ring-[#c4a35a]" %>
+                <%= f.submit "Set Goal", class: "px-4 py-2 bg-[#b54a3a] text-white rounded-lg text-sm hover:bg-[#9e3a2b] font-bold shadow transition-colors cursor-pointer" %>
               <% end %>
             </div>
-          <% else %>
-            <p class="text-xs md:text-sm text-gray-500 italic">Only family admins can set the season goal</p>
           <% end %>
         </div>
       <% end %>
     </div>
   </div>
 
+  <%# Progress Line Chart %>
   <% if current_family %>
-    <div class="mb-6 md:mb-8">
-      <h2 class="text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-red-400">Progress Chart</h2>
-      <div class="border-2 border-green-500 rounded-lg p-3 md:p-6 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg overflow-x-auto">
+    <div class="border border-[#1e3a5f] rounded-2xl p-4 md:p-6 bg-[#152a48] shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg md:text-xl font-bold text-[#f4efe4] flex items-center gap-2">
+          <span>📈</span> Trees Over Time
+        </h2>
+        <span class="text-xs text-[#9eb4d4]"><%= current_family.name %> Family</span>
+      </div>
+      <div class="overflow-x-auto">
         <% 
           family_entries_by_date = TreeEntry.for_season(@selected_season)
                                             .group_by { |e| e.entry_date }
@@ -82,55 +111,63 @@
                                             .to_h
         %>
         <% if family_entries_by_date.any? %>
-          <div class="min-w-0" style="min-width: 300px;">
+          <div class="min-w-[300px]">
             <%= line_chart family_entries_by_date, 
-                height: "300px",
+                height: "280px",
                 colors: ['#22c55e'],
                 library: { 
-                  title: "Trees Collected Over Time",
-                  titleTextStyle: { color: '#9CA3AF' },
-                  hAxis: { title: "Date", textStyle: { color: '#9CA3AF' }, titleTextStyle: { color: '#9CA3AF' }, gridlines: { color: '#374151' } },
-                  vAxis: { title: "Number of Trees", textStyle: { color: '#9CA3AF' }, titleTextStyle: { color: '#9CA3AF' }, gridlines: { color: '#374151' } },
+                  titleTextStyle: { color: '#c9bda4' },
+                  hAxis: { textStyle: { color: '#9eb4d4' }, gridlines: { color: '#1e3a5f' } },
+                  vAxis: { textStyle: { color: '#9eb4d4' }, gridlines: { color: '#1e3a5f' } },
                   backgroundColor: 'transparent',
-                  legend: { textStyle: { color: '#9CA3AF' }, position: 'none' },
-                  chartArea: { width: "70%", height: "70%" },
+                  legend: { position: 'none' },
+                  chartArea: { width: "85%", height: "75%" },
                   lineWidth: 3,
-                  pointSize: 5
+                  pointSize: 6
                 } %>
           </div>
         <% else %>
-          <p class="text-gray-400 text-center py-8">No entries yet for this season.</p>
+          <p class="text-[#7a8ea8] text-center py-8 text-sm">No tree entries logged yet for this season.</p>
         <% end %>
       </div>
     </div>
   <% end %>
 
-  <div class="mb-6 md:mb-8">
-    <div class="border-2 border-red-500 rounded-lg p-4 md:p-6 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
-      <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-red-400">Recent Entries (All Families)</h2>
-      <% if @recent_entries.any? %>
-        <div class="space-y-2">
-          <% @recent_entries.each do |entry| %>
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0 py-2 border-b border-gray-700">
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-sm md:text-base text-gray-100"><%= entry.entry_date.strftime("%B %d, %Y") %></p>
-                <p class="text-xs md:text-sm text-gray-400 truncate">
-                  <%= entry.family.name %> - <%= entry.user.email %>
-                </p>
-              </div>
-              <p class="text-base md:text-lg font-semibold whitespace-nowrap text-green-300"><%= entry.tree_count %> trees</p>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <p class="text-gray-400 text-center py-6 md:py-8 text-sm md:text-base">No entries yet for this season.</p>
-      <% end %>
+  <%# Recent Entries %>
+  <div class="border border-[#1e3a5f] rounded-2xl p-4 md:p-6 bg-[#152a48] shadow-xl">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg md:text-xl font-bold text-[#f4efe4] flex items-center gap-2">
+        <span>📜</span> Recent Entries
+      </h2>
+      <%= link_to "View All →", tree_entries_path, class: "text-xs font-semibold text-[#c4a35a] hover:text-[#e0c57a]" %>
     </div>
+    <% if @recent_entries.any? %>
+      <div class="divide-y divide-[#1e3a5f]">
+        <% @recent_entries.each do |entry| %>
+          <div class="flex justify-between items-center py-3">
+            <div class="min-w-0 pr-4">
+              <p class="font-semibold text-sm text-[#f4efe4]"><%= entry.entry_date.strftime("%B %d, %Y") %></p>
+              <p class="text-xs text-[#9eb4d4] truncate">
+                <span class="text-[#c4a35a] font-medium"><%= entry.family.name %></span> · <%= entry.user.email %>
+              </p>
+            </div>
+            <span class="text-base md:text-lg font-bold text-[#4ade80] bg-[#16a34a]/15 border border-[#16a34a]/30 px-3 py-1 rounded-lg whitespace-nowrap">
+              <%= entry.tree_count %> trees
+            </span>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-[#7a8ea8] text-center py-8 text-sm">No entries recorded yet this season.</p>
+    <% end %>
   </div>
 
-  <div class="mb-6 md:mb-8">
-    <h2 class="text-xl md:text-2xl font-semibold mb-3 md:mb-4 text-green-400">All Families Comparison</h2>
-    <div class="border-2 border-green-500 rounded-lg p-3 md:p-6 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg overflow-x-auto">
+  <%# All Families Comparison %>
+  <div class="border border-[#1e3a5f] rounded-2xl p-4 md:p-6 bg-[#152a48] shadow-xl">
+    <h2 class="text-lg md:text-xl font-bold text-[#f4efe4] mb-4 flex items-center gap-2">
+      <span>🏆</span> Family Comparison · <%= @selected_season.year %>
+    </h2>
+    <div class="overflow-x-auto">
       <% 
         family_totals = Family.joins(:tree_entries)
                              .where(tree_entries: { season: @selected_season })
@@ -138,23 +175,21 @@
                              .sum('tree_entries.tree_count')
       %>
       <% if family_totals.any? %>
-        <div class="min-w-0" style="min-width: 300px;">
+        <div class="min-w-[300px]">
           <%= column_chart family_totals, 
-              height: "300px",
-              colors: ['#ef4444', '#22c55e', '#eab308', '#dc2626', '#16a34a'],
+              height: "280px",
+              colors: ['#22c55e', '#b54a3a', '#c4a35a', '#4ea1ff', '#e0c57a'],
               library: { 
-                title: "Family Totals for #{@selected_season.year}",
-                titleTextStyle: { color: '#9CA3AF' },
-                hAxis: { title: "Family", textStyle: { color: '#9CA3AF' }, titleTextStyle: { color: '#9CA3AF' }, gridlines: { color: '#374151' } },
-                vAxis: { title: "Number of Trees", textStyle: { color: '#9CA3AF' }, titleTextStyle: { color: '#9CA3AF' }, gridlines: { color: '#374151' } },
+                titleTextStyle: { color: '#c9bda4' },
+                hAxis: { textStyle: { color: '#9eb4d4' }, gridlines: { color: '#1e3a5f' } },
+                vAxis: { textStyle: { color: '#9eb4d4' }, gridlines: { color: '#1e3a5f' } },
                 backgroundColor: 'transparent',
-                legend: { textStyle: { color: '#9CA3AF' }, position: 'none' },
-                chartArea: { width: "70%", height: "70%" },
-                bar: { groupWidth: '60%' }
+                legend: { position: 'none' },
+                chartArea: { width: "85%", height: "75%" }
               } %>
         </div>
       <% else %>
-        <p class="text-gray-400 text-center py-6 md:py-8 text-sm md:text-base">No entries yet for this season.</p>
+        <p class="text-[#7a8ea8] text-center py-8 text-sm">No family totals to display for this season yet.</p>
       <% end %>
     </div>
   </div>

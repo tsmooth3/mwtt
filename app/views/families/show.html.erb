@@ -1,43 +1,59 @@
-<div class="w-full">
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
-    <h1 class="text-2xl md:text-3xl font-bold text-red-400"><%= @family.name %></h1>
-    <%= link_to "Back to Families", families_path, class: "text-sm md:text-base text-blue-400 hover:text-blue-300" %>
+<div class="w-full space-y-6">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <div>
+      <div class="text-[11px] font-bold tracking-[2px] uppercase text-[#c4a35a]">FAMILY DETAILS</div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-[#f4efe4] tracking-tight flex items-center gap-2">
+        <span>🌲</span> <span><%= @family.name %></span>
+      </h1>
+    </div>
+    <%= link_to "← Back to Families", families_path, class: "text-sm font-semibold text-[#c4a35a] hover:text-[#e0c57a] transition-colors" %>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-    <div class="border-2 border-green-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
-      <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-green-400">Members</h2>
-      <ul class="space-y-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+    <div class="border border-[#1e3a5f] rounded-2xl p-5 md:p-6 bg-[#152a48] shadow-xl">
+      <h2 class="text-lg font-bold text-[#f4efe4] mb-4 flex items-center gap-2">
+        <span>👥</span> Members
+      </h2>
+      <ul class="divide-y divide-[#1e3a5f]">
         <% @family.users.each do |user| %>
-          <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0">
-            <span class="text-sm md:text-base truncate max-w-full text-gray-100"><%= user.email %></span>
+          <li class="py-3 flex justify-between items-center text-sm">
+            <span class="text-[#f4efe4] truncate max-w-[220px]"><%= user.email %></span>
             <% if @family.family_memberships.find_by(user: user)&.is_admin %>
-              <span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded whitespace-nowrap">Admin</span>
+              <span class="text-[11px] bg-[#c4a35a]/20 text-[#e0c57a] border border-[#c4a35a]/40 px-2.5 py-0.5 rounded-full font-semibold">Admin</span>
             <% end %>
           </li>
         <% end %>
       </ul>
     </div>
 
-    <div class="border-2 border-red-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg">
-      <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-red-400">Your Status</h2>
-      <% if @is_member %>
-        <p class="text-sm md:text-base text-green-400 mb-2">✓ You are a member</p>
-        <% if @is_admin %>
-          <p class="text-sm md:text-base text-green-300 mb-4">✓ You are an admin</p>
+    <div class="border border-[#1e3a5f] rounded-2xl p-5 md:p-6 bg-[#152a48] shadow-xl flex flex-col justify-between">
+      <div>
+        <h2 class="text-lg font-bold text-[#f4efe4] mb-3 flex items-center gap-2">
+          <span>🏷️</span> Your Status
+        </h2>
+        <% if @is_member %>
+          <p class="text-sm text-[#4ade80] font-semibold mb-1">✓ You are an active member</p>
+          <% if @is_admin %>
+            <p class="text-xs text-[#e0c57a] mb-4">👑 Family Administrator</p>
+          <% end %>
+        <% elsif current_user.families.any? %>
+          <p class="text-sm text-[#9eb4d4] mb-2">You are already a member of another family.</p>
+          <p class="text-xs text-[#7a8ea8]">Leave your current family if you wish to join this one.</p>
+        <% else %>
+          <p class="text-sm text-[#9eb4d4] mb-4">You have not joined this family yet.</p>
         <% end %>
-        <% unless @is_admin %>
+      </div>
+
+      <div class="pt-4 border-t border-[#1e3a5f]">
+        <% if @is_member && !@is_admin %>
           <% membership = current_user.family_memberships.find_by(family: @family) %>
           <% if membership %>
-            <%= button_to "Leave Family", family_family_membership_path(@family, membership), method: :delete, data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to leave this family?" }, class: "w-full sm:w-auto px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md hover:bg-red-500 shadow-md" %>
+            <%= button_to "Leave Family", family_family_membership_path(@family, membership), method: :delete, data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to leave this family?" }, class: "w-full sm:w-auto px-4 py-2 text-sm bg-[#b54a3a] hover:bg-[#9e3a2b] text-white rounded-xl font-bold shadow transition-colors cursor-pointer" %>
           <% end %>
+        <% elsif !@is_member && !current_user.families.any? %>
+          <%= button_to "Join Family", family_family_memberships_path(@family), method: :post, data: { turbo_method: :post }, class: "w-full sm:w-auto px-5 py-2.5 text-sm bg-[#16a34a] hover:bg-[#15803d] text-white rounded-xl font-bold shadow transition-colors cursor-pointer" %>
         <% end %>
-      <% elsif current_user.families.any? %>
-        <p class="text-sm md:text-base text-gray-400 mb-2">You are already a member of another family.</p>
-        <p class="text-xs md:text-sm text-gray-500">Leave your current family to join this one.</p>
-      <% else %>
-        <%= button_to "Join Family", family_family_memberships_path(@family), method: :post, data: { turbo_method: :post }, class: "w-full sm:w-auto px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-md hover:bg-green-500 shadow-md" %>
-      <% end %>
+      </div>
     </div>
   </div>
 </div>
