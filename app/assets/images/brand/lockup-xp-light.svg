@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 168" role="img" aria-label="extrapants XP belt lockup light">
+  <defs>
+    <linearGradient id="brassL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0c57a"/>
+      <stop offset="50%" stop-color="#c4a35a"/>
+      <stop offset="100%" stop-color="#9a7a38"/>
+    </linearGradient>
+    <linearGradient id="leatherL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a3a28"/>
+      <stop offset="100%" stop-color="#3a2418"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(8,20)">
+    <rect width="128" height="128" rx="28" fill="#f4efe4"/>
+    <rect x="0" y="46" width="128" height="36" fill="url(#leatherL)"/>
+    <rect x="0" y="50" width="128" height="3" fill="#6b4632"/>
+    <rect x="0" y="75" width="128" height="3" fill="#2a1810"/>
+    <rect x="16" y="32" width="96" height="64" rx="11" fill="url(#brassL)"/>
+    <rect x="24" y="40" width="80" height="48" rx="7" fill="#1e3a5f"/>
+    <g transform="translate(49 64)" fill="#f4efe4">
+      <rect x="-4" y="-16" width="8" height="32" rx="2" transform="rotate(-38)"/>
+      <rect x="-4" y="-16" width="8" height="32" rx="2" transform="rotate(38)"/>
+    </g>
+    <g fill="#f4efe4">
+      <rect x="66" y="48" width="7.4" height="32" rx="2"/>
+      <path d="M69.6 48h15.6c7.4 0 12.6 4.8 12.6 11.8S92.6 71.6 85.2 71.6H69.6V48z"/>
+      <rect x="73.4" y="55.2" width="8.8" height="10" rx="2.6" fill="#1e3a5f"/>
+    </g>
+  </g>
+  <text x="160" y="90" font-family="Noto Sans, Liberation Sans, sans-serif" font-size="56" font-weight="500" fill="#2c5282" letter-spacing="-1.2">extra</text>
+  <text x="304" y="90" font-family="Noto Sans, Liberation Sans, sans-serif" font-size="56" font-weight="800" fill="#0f1c2e" letter-spacing="-1.6">pants</text>
+  <text x="160" y="120" font-family="Noto Sans, Liberation Sans, sans-serif" font-size="16" font-weight="500" fill="#7a6a4a" letter-spacing="3.4">A SPARE PAIR OF PROJECTS</text>
+</svg>

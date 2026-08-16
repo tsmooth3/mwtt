@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="extrapants XP belt buckle transparent">
+  <defs>
+    <linearGradient id="brassClear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0c57a"/>
+      <stop offset="50%" stop-color="#c4a35a"/>
+      <stop offset="100%" stop-color="#9a7a38"/>
+    </linearGradient>
+    <linearGradient id="leatherClear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b4632"/>
+      <stop offset="100%" stop-color="#4a2e1e"/>
+    </linearGradient>
+    <mask id="strapHole">
+      <rect width="128" height="128" fill="#fff"/>
+      <rect x="24" y="40" width="80" height="48" rx="7" fill="#000"/>
+    </mask>
+  </defs>
+  <g mask="url(#strapHole)">
+    <rect x="0" y="46" width="128" height="36" fill="url(#leatherClear)"/>
+    <rect x="0" y="50" width="128" height="3" fill="#8a5e44"/>
+    <rect x="0" y="75" width="128" height="3" fill="#3a2418"/>
+  </g>
+  <path fill="url(#brassClear)" fill-rule="evenodd" d="M16 32h96a11 11 0 0 1 11 11v42a11 11 0 0 1-11 11H16A11 11 0 0 1 5 85V43A11 11 0 0 1 16 32zm8 8h80a7 7 0 0 1 7 7v34a7 7 0 0 1-7 7H24a7 7 0 0 1-7-7V47a7 7 0 0 1 7-7z"/>
+  <g transform="translate(49 64)" fill="#1e3a5f">
+    <rect x="-4" y="-16" width="8" height="32" rx="2" transform="rotate(-38)"/>
+    <rect x="-4" y="-16" width="8" height="32" rx="2" transform="rotate(38)"/>
+  </g>
+  <rect x="66" y="48" width="7.4" height="32" rx="2" fill="#1e3a5f"/>
+  <path fill="#1e3a5f" fill-rule="evenodd" d="
+    M69.6 48 H85.2 C92.6 48 97.8 52.8 97.8 59.8 S92.6 71.6 85.2 71.6 H69.6 Z
+    M76.8 55.4 h6.2 a3.4 3.4 0 0 1 0 6.8 h-6.2 Z"/>
+</svg>

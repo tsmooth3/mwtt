@@ -1,46 +1,66 @@
-<div class="w-full">
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-6">
-    <h1 class="text-2xl md:text-3xl font-bold text-red-400">🎄 Families</h1>
-    <%= link_to "Create New Family", new_family_path, class: "px-3 md:px-4 py-2 text-sm md:text-base bg-red-600 text-white rounded-md hover:bg-red-500 whitespace-nowrap shadow-md hover:shadow-lg transition-all font-medium" %>
+<div class="w-full space-y-6">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <div class="text-[11px] font-bold tracking-[2px] uppercase text-[#c4a35a]">COMMUNITY</div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-[#f4efe4] tracking-tight flex items-center gap-2">
+        <span>🎄</span> <span>Families</span>
+      </h1>
+    </div>
+    <%= link_to new_family_path, class: "px-4 py-2.5 bg-[#b54a3a] hover:bg-[#9e3a2b] text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 text-sm" do %>
+      <span>+</span> <span>Create New Family</span>
+    <% end %>
   </div>
 
   <% unless @user_families.any? %>
-    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-900/90 to-yellow-800/90 border-2 border-yellow-500 rounded-lg">
-      <p class="text-yellow-100 font-medium">
-        👋 Welcome! To get started, please join an existing family or create a new one.
+    <div class="p-5 bg-[#152a48] border-2 border-[#c4a35a] rounded-2xl shadow-md">
+      <p class="text-[#f4efe4] font-medium text-sm">
+        👋 <strong class="text-[#e0c57a]">Welcome!</strong> To start tracking trees, join an existing family below or create a new one.
       </p>
     </div>
   <% end %>
 
   <% if @user_families.any? %>
-    <div class="mb-8">
-      <h2 class="text-xl font-semibold mb-4">Your Families</h2>
+    <div class="space-y-3">
+      <h2 class="text-lg font-bold text-[#f4efe4] flex items-center gap-2">
+        <span>🌲</span> Your Families
+      </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <% @user_families.each do |family| %>
-        <div class="border-2 border-green-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 hover:shadow-lg transition-shadow">
-          <h3 class="text-lg font-semibold mb-2 text-green-400"><%= family.name %></h3>
-          <p class="text-sm text-green-300 mb-4">Members: <%= family.users.count %></p>
-          <%= link_to "View Family", family_path(family), class: "text-red-400 hover:text-red-300 font-semibold" %>
-        </div>
+          <div class="border border-[#16a34a]/60 rounded-2xl p-5 bg-gradient-to-br from-[#152a48] to-[#0f1c2e] shadow-lg flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-[#4ade80]"><%= family.name %></h3>
+                <span class="text-[11px] bg-[#16a34a]/20 text-[#4ade80] border border-[#16a34a]/40 px-2 py-0.5 rounded-full font-semibold">Member</span>
+              </div>
+              <p class="text-xs text-[#9eb4d4] mb-4">Members: <strong class="text-[#f4efe4]"><%= family.users.count %></strong></p>
+            </div>
+            <%= link_to "View Family Dashboard →", family_path(family), class: "text-xs font-bold text-[#c4a35a] hover:text-[#e0c57a] transition-colors" %>
+          </div>
         <% end %>
       </div>
     </div>
   <% end %>
 
-  <div>
-    <h2 class="text-xl font-semibold mb-4">All Families</h2>
+  <div class="space-y-3 pt-2">
+    <h2 class="text-lg font-bold text-[#f4efe4] flex items-center gap-2">
+      <span>🏘️</span> All Families
+    </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <% @families.each do |family| %>
-        <div class="border-2 border-red-500 rounded-lg p-4 bg-gradient-to-br from-gray-800 to-gray-900 hover:shadow-lg transition-shadow">
-          <h3 class="text-lg font-semibold mb-2 text-red-400"><%= family.name %></h3>
-          <p class="text-sm text-red-300 mb-4">Members: <%= family.users.count %></p>
-          <% if current_user.families.include?(family) %>
-            <span class="text-green-400 text-sm font-semibold">✓ You are a member</span>
-          <% elsif current_user.families.any? %>
-            <span class="text-gray-500 text-sm">---</span>
-          <% else %>
-            <%= button_to "Join Family", family_family_memberships_path(family), method: :post, data: { turbo_method: :post }, class: "text-red-400 hover:text-red-300 font-semibold" %>
-          <% end %>
+        <div class="border border-[#1e3a5f] rounded-2xl p-5 bg-[#152a48] shadow-lg flex flex-col justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-[#f4efe4] mb-1"><%= family.name %></h3>
+            <p class="text-xs text-[#9eb4d4] mb-4">Members: <strong class="text-[#f4efe4]"><%= family.users.count %></strong></p>
+          </div>
+          <div>
+            <% if current_user.families.include?(family) %>
+              <span class="text-xs font-bold text-[#4ade80] flex items-center gap-1">✓ You are a member</span>
+            <% elsif current_user.families.any? %>
+              <span class="text-xs text-[#7a8ea8]">Joined other family</span>
+            <% else %>
+              <%= button_to "Join Family", family_family_memberships_path(family), method: :post, data: { turbo_method: :post }, class: "w-full py-2 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-lg text-xs font-bold shadow transition-colors cursor-pointer" %>
+            <% end %>
+          </div>
         </div>
       <% end %>
     </div>
