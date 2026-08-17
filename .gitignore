@@ -84,10 +84,8 @@ yarn-debug.log*
 *.tmp
 
 # Ignore Ruby version managers.
-/.ruby-version
 /.ruby-gemset
 .rvmrc
-.ruby-version
 
 # Ignore bundler.
 /vendor/bundle

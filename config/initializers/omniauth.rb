@@ -6,8 +6,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   begin
     oauth_creds = Rails.application.credentials.dig(:oauth)
     if oauth_creds && oauth_creds[:google_client_id] && oauth_creds[:google_client_secret]
-      provider :google_oauth2, 
-               oauth_creds[:google_client_id], 
+      provider :google_oauth2,
+               oauth_creds[:google_client_id],
                oauth_creds[:google_client_secret]
     end
   rescue NoMethodError, TypeError

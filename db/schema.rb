@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_11_020047) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_16_212000) do
   create_table "families", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -26,6 +26,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_11_020047) do
     t.index ["family_id"], name: "index_family_memberships_on_family_id"
     t.index ["user_id", "family_id"], name: "index_family_memberships_on_user_id_and_family_id", unique: true
     t.index ["user_id"], name: "index_family_memberships_on_user_id"
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.decimal "latitude", precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
+    t.string "name"
+    t.boolean "hidden", default: false, null: false
+    t.integer "creator_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_locations_on_creator_id"
+    t.index ["latitude", "longitude"], name: "index_locations_on_latitude_and_longitude"
   end
 
   create_table "season_goals", force: :cascade do |t|
@@ -45,15 +57,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_11_020047) do
 
   create_table "tree_entries", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "family_id", null: false
+    t.bigint "family_id"
     t.bigint "season_id", null: false
     t.date "entry_date", null: false
-    t.integer "tree_count", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "location_id"
+    t.integer "seen"
+    t.integer "collected", default: 0, null: false
     t.index ["entry_date"], name: "index_tree_entries_on_entry_date"
     t.index ["family_id", "season_id"], name: "index_tree_entries_on_family_id_and_season_id"
     t.index ["family_id"], name: "index_tree_entries_on_family_id"
+    t.index ["location_id"], name: "index_tree_entries_on_location_id"
     t.index ["season_id"], name: "index_tree_entries_on_season_id"
     t.index ["user_id"], name: "index_tree_entries_on_user_id"
   end
@@ -74,8 +89,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_11_020047) do
 
   add_foreign_key "family_memberships", "families"
   add_foreign_key "family_memberships", "users"
+  add_foreign_key "locations", "users", column: "creator_id"
   add_foreign_key "season_goals", "seasons"
   add_foreign_key "tree_entries", "families"
+  add_foreign_key "tree_entries", "locations"
   add_foreign_key "tree_entries", "seasons"
   add_foreign_key "tree_entries", "users"
 end

@@ -1,44 +1,12 @@
 <div class="w-full max-w-md mx-auto py-4">
   <div class="mb-6">
-    <div class="text-[11px] font-bold tracking-[2px] uppercase text-[#c4a35a] mb-1">COLLECTION LOG</div>
+    <div class="text-[11px] font-bold tracking-[2px] uppercase text-[#c4a35a] mb-1">FIELD REPORT</div>
     <h1 class="text-2xl font-extrabold text-[#f4efe4] tracking-tight flex items-center gap-2">
-      <span>✏️</span> <span>Edit Tree Entry</span>
+      <span>✏️</span> <span>Edit Entry</span>
     </h1>
   </div>
 
   <div class="border border-[#1e3a5f] rounded-2xl p-6 bg-[#152a48] shadow-xl">
-    <%= form_with model: @tree_entry, local: true, class: "space-y-4" do |f| %>
-      <% if @tree_entry.errors.any? %>
-        <div class="bg-[#b54a3a]/20 border border-[#b54a3a] text-[#f4efe4] px-4 py-3 rounded-xl text-sm">
-          <ul class="list-disc list-inside space-y-1">
-            <% @tree_entry.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div>
-        <%= f.label :family_id, "Family", class: "block text-xs font-bold text-[#c9bda4] uppercase tracking-wider mb-2" %>
-        <%= f.collection_select :family_id, @families, :id, :name, 
-            { prompt: "Select a family..." }, 
-            { class: "w-full px-4 py-2.5 border border-[#1e3a5f] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#c4a35a] bg-[#0f1c2e] text-[#f4efe4] text-sm" } %>
-      </div>
-
-      <div>
-        <%= f.label :entry_date, "Date", class: "block text-xs font-bold text-[#c9bda4] uppercase tracking-wider mb-2" %>
-        <%= f.date_field :entry_date, class: "w-full px-4 py-2.5 border border-[#1e3a5f] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#c4a35a] bg-[#0f1c2e] text-[#f4efe4] text-sm" %>
-      </div>
-
-      <div>
-        <%= f.label :tree_count, "Number of Trees", class: "block text-xs font-bold text-[#c9bda4] uppercase tracking-wider mb-2" %>
-        <%= f.number_field :tree_count, min: 1, step: 1, class: "w-full px-4 py-2.5 border border-[#1e3a5f] rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#c4a35a] bg-[#0f1c2e] text-[#f4efe4] text-sm" %>
-      </div>
-
-      <div class="flex flex-col sm:flex-row gap-3 pt-2">
-        <%= f.submit "Update Entry", class: "px-5 py-2.5 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-xl font-bold shadow transition-colors cursor-pointer text-sm" %>
-        <%= link_to "Cancel", tree_entries_path, class: "px-5 py-2.5 border border-[#1e3a5f] hover:bg-[#0f1c2e] rounded-xl text-center text-[#c9bda4] text-sm font-medium transition-colors" %>
-      </div>
-    <% end %>
+    <%= render "form", tree_entry: @tree_entry, families: @families, submit_label: "Update Entry", cancel_path: tree_entry_path(@tree_entry) %>
   </div>
 </div>

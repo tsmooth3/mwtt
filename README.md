@@ -6,10 +6,10 @@ A Ruby on Rails web application for tracking tree collections by families and se
 
 - **Authentication**: Email/password and Google OAuth login
 - **Family Management**: Create and join families, with admin roles
-- **Tree Entry Tracking**: Log tree collections with date and count
-- **Seasonal Goals**: Set and track goals per family per season (year)
-- **Dashboard**: View family totals, overall totals, and progress charts
-- **Leaderboard**: See family rankings by season
+- **Tree Entry Tracking**: Log what was seen and what was collected, with an optional map pin
+- **Shared Hunt Map**: Current-season inventory, cleared and empty checks, plus last year's places as a hint
+- **Seasonal Goals**: Set and track a shared bonfire goal per winter season
+- **Dashboard**: Family totals, overall totals, a season map, and progress charts
 - **Charts & Visualization**: Visual progress tracking with Chartkick
 
 ## Setup
@@ -64,9 +64,10 @@ A Ruby on Rails web application for tracking tree collections by families and se
 - **User**: Authentication and user data
 - **Family**: Family groups
 - **FamilyMembership**: Join table with admin flag
-- **Season**: Year-based seasons
-- **SeasonGoal**: Goals per family per season
-- **TreeEntry**: Individual tree collection entries
+- **Season**: Christmas-winter seasons (Dec 1 – Feb 15, labeled by that Christmas)
+- **SeasonGoal**: Shared bonfire goal per season
+- **Location**: Reusable map pin
+- **TreeEntry**: Field report of trees seen and collected
 
 ## Development
 
