@@ -4,8 +4,10 @@ class Season < ApplicationRecord
   WINDOW_END_MONTH = 2
   WINDOW_END_DAY = 15
 
+  USA_FOUNDING_YEAR = 1776
+
   has_many :tree_entries, dependent: :destroy
-  has_many :season_goals, dependent: :destroy
+  has_one :season_goal, dependent: :destroy
 
   validates :year, presence: true, uniqueness: true
 
@@ -53,6 +55,14 @@ class Season < ApplicationRecord
 
   def recap?(on: Date.current)
     !live?(on: on)
+  end
+
+  def default_goal_count
+    year + 1 - USA_FOUNDING_YEAR
+  end
+
+  def goal_count
+    season_goal&.goal_count || default_goal_count
   end
 
   def self.reassign_entries!

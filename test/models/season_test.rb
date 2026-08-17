@@ -54,4 +54,19 @@ class SeasonTest < ActiveSupport::TestCase
       assert Season.current.live?
     end
   end
+
+  test "default goal is the age of the USA that winter" do
+    assert_equal 250, seasons(:season_2025).default_goal_count
+    assert_equal 251, seasons(:season_2026).default_goal_count
+  end
+
+  test "goal_count uses the stored override when one exists" do
+    assert_equal 200, seasons(:season_2025).goal_count
+  end
+
+  test "goal_count falls back to USA age when no override exists" do
+    SeasonGoal.where(season: seasons(:season_2024)).delete_all
+
+    assert_equal 249, seasons(:season_2024).goal_count
+  end
 end

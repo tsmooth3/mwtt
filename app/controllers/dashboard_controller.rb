@@ -21,8 +21,9 @@ class DashboardController < ApplicationController
     @overall_total = TreeEntry.for_season(@selected_season).sum(:collected)
     @recent_entries = TreeEntry.for_season(@selected_season).collections.recent.limit(10)
 
-    @season_goal = SeasonGoal.find_by(season: @selected_season)
-    @overall_progress = @season_goal && @season_goal.goal_count > 0 ? (@overall_total.to_f / @season_goal.goal_count * 100) : 0
+    @season_goal = @selected_season.season_goal
+    @goal_count = @selected_season.goal_count
+    @overall_progress = @goal_count.positive? ? (@overall_total.to_f / @goal_count * 100) : 0
 
     @map_pins = MapPin.for_season(@selected_season, recap: @recap)
   end

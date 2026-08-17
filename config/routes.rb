@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   end
 
   resources :tree_entries
-  resources :season_goals, only: [ :create, :update, :edit ]
+  resources :season_goals, only: [ :update, :edit ]
   resources :locations, only: [ :update, :destroy ] do
     get :nearby, on: :collection
     member do

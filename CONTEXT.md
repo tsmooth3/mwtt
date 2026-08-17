@@ -19,7 +19,7 @@ The winter after a Christmas, labeled by that Christmas's year. 4 January 2027 i
 _Avoid_: Calendar year, year
 
 **Season Goal**:
-The number of collected trees, across all families, that the bonfire is aiming for this season.
+The number of collected trees, across all families, that the bonfire is aiming for this season. Defaults to the age of the USA that winter (season 2025 → 250). An admin can override it.
 _Avoid_: Quota
 
 ## Field report
