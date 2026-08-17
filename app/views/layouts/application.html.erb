@@ -22,6 +22,11 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" data-turbo-track="reload">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" data-turbo-track="reload">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" data-turbo-track="reload">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" data-turbo-track="reload"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" data-turbo-track="reload"></script>
     <style>
       /* extrapants brand foundation */
       html, body {
@@ -96,6 +101,7 @@
           <%# Desktop Nav %>
           <% if user_signed_in? %>
             <div class="hidden md:flex items-center space-x-6">
+              <%= link_to "Map", map_path, class: "text-sm font-medium text-[#c9bda4] hover:text-[#e0c57a] transition-colors" %>
               <%= link_to "Entries", tree_entries_path, class: "text-sm font-medium text-[#c9bda4] hover:text-[#e0c57a] transition-colors" %>
               <%= link_to "Families", families_path, class: "text-sm font-medium text-[#c9bda4] hover:text-[#e0c57a] transition-colors" %>
               <span class="text-xs text-[#9eb4d4] truncate max-w-[160px] bg-[#152a48] border border-[#1e3a5f] px-2.5 py-1 rounded-full"><%= current_user.email %></span>
@@ -103,6 +109,7 @@
             </div>
           <% else %>
             <div class="hidden md:flex items-center space-x-6">
+              <%= link_to "Map", map_path, class: "text-sm font-medium text-[#c9bda4] hover:text-[#e0c57a] transition-colors" %>
               <%= link_to "Entries", tree_entries_path, class: "text-sm font-medium text-[#c9bda4] hover:text-[#e0c57a] transition-colors" %>
               <%= link_to "Families", families_path, class: "text-sm font-medium text-[#c9bda4] hover:text-[#e0c57a] transition-colors" %>
               <div class="flex items-center space-x-3">
@@ -140,6 +147,9 @@
             <%= link_to root_path, class: "flex items-center px-3 py-2 rounded-lg text-sm font-medium text-[#f4efe4] hover:bg-[#152a48] hover:text-[#e0c57a] transition-colors", data: { action: "click->mobile-menu#close" } do %>
               <span>🏠 Dashboard</span>
             <% end %>
+            <%= link_to map_path, class: "flex items-center px-3 py-2 rounded-lg text-sm font-medium text-[#f4efe4] hover:bg-[#152a48] hover:text-[#e0c57a] transition-colors", data: { action: "click->mobile-menu#close" } do %>
+              <span>🗺️ Map</span>
+            <% end %>
             <%= link_to tree_entries_path, class: "flex items-center px-3 py-2 rounded-lg text-sm font-medium text-[#f4efe4] hover:bg-[#152a48] hover:text-[#e0c57a] transition-colors", data: { action: "click->mobile-menu#close" } do %>
               <span>📋 Entries</span>
             <% end %>
@@ -152,6 +162,7 @@
               <% end %>
             </div>
           <% else %>
+            <%= link_to "Map", map_path, class: "block px-3 py-2 rounded-lg text-sm font-medium text-[#f4efe4] hover:bg-[#152a48] hover:text-[#e0c57a]", data: { action: "click->mobile-menu#close" } %>
             <%= link_to "Entries", tree_entries_path, class: "block px-3 py-2 rounded-lg text-sm font-medium text-[#f4efe4] hover:bg-[#152a48] hover:text-[#e0c57a]", data: { action: "click->mobile-menu#close" } %>
             <%= link_to "Families", families_path, class: "block px-3 py-2 rounded-lg text-sm font-medium text-[#f4efe4] hover:bg-[#152a48] hover:text-[#e0c57a]", data: { action: "click->mobile-menu#close" } %>
             <div class="pt-2 border-t border-[#1e3a5f] flex flex-col space-y-2">

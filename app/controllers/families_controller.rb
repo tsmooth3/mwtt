@@ -10,9 +10,9 @@ class FamiliesController < ApplicationController
 
   def create
     @family = Family.new(family_params)
-    
+
     if @family.save
-      redirect_to @family, notice: 'Family created successfully!'
+      redirect_to @family, notice: "Family created successfully!"
     else
       render :new, status: :unprocessable_entity
     end

@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :family_memberships, dependent: :destroy
   has_many :families, through: :family_memberships
   has_many :tree_entries, dependent: :destroy
+  has_many :created_locations, class_name: "Location", foreign_key: :creator_id, dependent: :restrict_with_error
 
   def self.from_omniauth(auth)
     where(provider: auth.provider, uid: auth.uid).first_or_create do |user|

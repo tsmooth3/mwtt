@@ -1,11 +1,7 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+season_2025:
+  season: season_2025
+  goal_count: 200
 
-one:
-  family: one
-  season: one
-  goal_count: 1
-
-two:
-  family: two
-  season: two
-  goal_count: 1
+season_2026:
+  season: season_2026
+  goal_count: 250

@@ -1,7 +1,8 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+season_2024:
+  year: 2024
 
-one:
-  year: 1
+season_2025:
+  year: 2025
 
-two:
-  year: 1
+season_2026:
+  year: 2026

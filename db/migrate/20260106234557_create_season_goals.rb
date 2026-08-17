@@ -8,6 +8,6 @@ class CreateSeasonGoals < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :season_goals, [:family_id, :season_id], unique: true
+    add_index :season_goals, [ :family_id, :season_id ], unique: true
   end
 end

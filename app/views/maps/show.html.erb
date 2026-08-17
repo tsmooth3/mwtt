@@ -1,0 +1,49 @@
+<div class="w-full space-y-4"
+     data-controller="hunt-map"
+     data-hunt-map-pins-value="<%= @pins.to_json %>"
+     data-hunt-map-recap-value="<%= @recap %>"
+     data-hunt-map-interactive-value="true"
+     data-hunt-map-new-entry-path-value="<%= new_tree_entry_path %>"
+     data-hunt-map-hide-path-template-value="<%= hide_location_path('__ID__') %>">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <div class="text-[11px] font-bold tracking-[2px] uppercase text-[#c4a35a]">HUNTING GROUND</div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-[#f4efe4] tracking-tight">
+        <%= @recap ? "Recap" : "Map" %> · <%= @selected_season.year %>
+      </h1>
+      <p class="text-sm text-[#9eb4d4] mt-1">
+        <%= @recap ? "Inventory from this winter is compost. Pins show where we looked and what we hauled." : "Green still has trees. Gold is unknown leftover. Blue is cleared. Grey was empty." %>
+      </p>
+    </div>
+    <%= form_with url: map_path, method: :get, local: true do %>
+      <%= select_tag :season_id,
+          options_from_collection_for_select(@all_seasons, :year, :year, @selected_season.year),
+          { onchange: "this.form.submit()", class: "px-3.5 py-1.5 border border-[#1e3a5f] rounded-lg bg-[#0f1c2e] text-[#f4efe4] text-sm" } %>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap gap-2" data-hunt-map-target="filters">
+    <% [
+      ["inventory", "Inventory", "bg-[#22c55e]"],
+      ["unknown", "Unknown", "bg-[#e0c57a]"],
+      ["cleared", "Cleared", "bg-[#4ea1ff]"],
+      ["empty", "Empty", "bg-[#9eb4d4]"],
+      ["last_year", "Last year", "bg-[#7a6a4a]"]
+    ].each do |state, label, color| %>
+      <% next if @recap && state == "last_year" %>
+      <button type="button"
+              data-action="hunt-map#toggleState"
+              data-state="<%= state %>"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0f1c2e] <%= color %>">
+        <%= label %>
+      </button>
+    <% end %>
+  </div>
+
+  <div class="relative border border-[#1e3a5f] rounded-2xl overflow-hidden bg-[#152a48]">
+    <div data-hunt-map-target="canvas" class="h-[70vh] min-h-[420px] w-full"></div>
+    <div data-hunt-map-target="popup" class="hidden absolute bottom-4 left-4 right-4 md:left-auto md:w-96 bg-[#0f1c2e]/95 border border-[#1e3a5f] rounded-xl p-4 shadow-2xl"></div>
+  </div>
+
+  <p class="text-xs text-[#7a8ea8]">Tap the map to drop a new pin and log an entry. Tap an existing pin to see what's left.</p>
+</div>
