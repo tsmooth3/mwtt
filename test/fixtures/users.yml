@@ -5,3 +5,7 @@ one:
 two:
   email: two@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>
+
+joiner:
+  email: joiner@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>
